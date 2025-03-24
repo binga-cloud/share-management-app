@@ -1,0 +1,253 @@
+{% extends 'layout.html' %}
+{% block content %}
+<h2>📊 Share Report</h2>
+
+<!-- Filter by Item -->
+<form method="get" action="{{ url_for('report') }}">
+    <label for="item_name">Filter by Item:</label>
+    <select name="item_name" id="item_name" onchange="this.form.submit()">
+        <option value="all" {% if not selected_item %}selected{% endif %}>All Items</option>
+        {% for item in unique_items %}
+            <option value="{{ item }}" {% if selected_item == item %}selected{% endif %}>{{ item }}</option>
+        {% endfor %}
+    </select>
+    <!-- Hidden input to preserve the report_type filter -->
+    <input type="hidden" name="report_type" value="{{ selected_report_type }}">
+</form>
+
+<!-- Filter by Report -->
+<form method="get" action="{{ url_for('report') }}">
+    <label for="report_type">Filter by Report:</label>
+    <select name="report_type" id="report_type" onchange="this.form.submit()">
+        <option value="all" {% if not selected_report_type %}selected{% endif %}>All Reports</option>
+        <option value="purchases" {% if selected_report_type == 'purchases' %}selected{% endif %}>Purchases</option>
+        <option value="sales" {% if selected_report_type == 'sales' %}selected{% endif %}>Sales</option>
+        <option value="dividends" {% if selected_report_type == 'dividends' %}selected{% endif %}>Dividends</option>
+        <option value="ipos" {% if selected_report_type == 'ipos' %}selected{% endif %}>IPOs</option>
+        <option value="bonuses" {% if selected_report_type == 'bonuses' %}selected{% endif %}>Bonus Shares</option>
+        <option value="item_summary" {% if selected_report_type == 'item_summary' %}selected{% endif %}>Item Summary</option>
+        <option value="profit_loss" {% if selected_report_type == 'profit_loss' %}selected{% endif %}>Profit/Loss Summary</option>
+    </select>
+    <!-- Hidden input to preserve the item_name filter -->
+    <input type="hidden" name="item_name" value="{{ selected_item }}">
+</form>
+
+<!-- Purchase Summary -->
+{% if selected_report_type == 'all' or selected_report_type == 'purchases' %}
+<h3>🛒 Purchase Summary</h3>
+<table>
+    <tr>
+        <th>Item</th>
+        <th>Purchase Date</th>
+        <th>Purchased Quantity</th>
+        <th>Purchase Rate</th>
+        <th>Total Purchased Cost</th>
+        <th>Actions</th>
+    </tr>
+    {% for item in purchases %}
+    <tr>
+        <td>{{ item.item_name }}</td>
+        <td>{{ item.buy_date | format_date }}</td>
+        <td>{{ item.buy_quantity }}</td>
+        <td>${{ "%.2f"|format(item.buy_rate) }}</td>
+        <td>${{ "%.2f"|format(item.buy_quantity * item.buy_rate * 1.004) }}</td>
+        <td>
+            <a href="{{ url_for('edit_buy', id=item.id) }}">Edit</a>
+            <form action="{{ url_for('delete_buy', id=item.id) }}" method="post" style="display:inline;">
+                <button type="submit">Delete</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}
+
+<!-- Sales Summary -->
+{% if selected_report_type == 'all' or selected_report_type == 'sales' %}
+<h3>💰 Sales Summary</h3>
+<table>
+    <tr>
+        <th>Item</th>
+        <th>Sell Date</th>
+        <th>Sold Quantity</th>
+        <th>Sale Rate</th>
+        <th>Total Sell Amount</th>
+        <th>Actions</th>
+    </tr>
+    {% for item in sales %}
+    <tr>
+        <td>{{ item.item_name }}</td>
+        <td>{{ item.sell_date | format_date }}</td>
+        <td>{{ item.sell_quantity }}</td>
+        <td>${{ "%.2f"|format(item.sell_rate) }}</td>
+        <td>${{ "%.2f"|format(item.sell_quantity * item.sell_rate * 0.996) }}</td>
+        <td>
+            <a href="{{ url_for('edit_sell', id=item.id) }}">Edit</a>
+            <form action="{{ url_for('delete_sell', id=item.id) }}" method="post" style="display:inline;">
+                <button type="submit">Delete</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}
+
+<!-- IPO Summary -->
+{% if selected_report_type == 'all' or selected_report_type == 'ipos' %}
+<h3>📈 IPO Summary</h3>
+<table>
+    <tr>
+        <th>Item</th>
+        <th>IPO Date</th>
+        <th>IPO Quantity</th>
+        <th>IPO Rate</th>
+        <th>Total IPO Cost</th>
+        <th>Actions</th>
+    </tr>
+    {% for item in ipos %}
+    <tr>
+        <td>{{ item.item_name }}</td>
+        <td>{{ item.ipo_date | format_date }}</td>
+        <td>{{ item.ipo_quantity }}</td>
+        <td>${{ "%.2f"|format(item.ipo_rate) }}</td>
+        <td>${{ "%.2f"|format(item.ipo_quantity * item.ipo_rate) }}</td>
+        <td>
+            <a href="{{ url_for('edit_ipo', id=item.id) }}">Edit</a>
+            <form action="{{ url_for('delete_ipo', id=item.id) }}" method="post" style="display:inline;">
+                <button type="submit">Delete</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}
+
+<!-- Dividend Summary -->
+{% if selected_report_type == 'all' or selected_report_type == 'dividends' %}
+<h3>💵 Dividend Summary</h3>
+<table>
+    <tr>
+        <th>Item</th>
+        <th>Dividend Date</th>
+        <th>Total Dividend Earned</th>
+        <th>Actions</th>
+    </tr>
+    {% for item in dividends %}
+    <tr>
+        <td>{{ item.item_name }}</td>
+        <td>{{ item.dividend_date | format_date }}</td>
+        <td>${{ "%.2f"|format(item.dividend_amount) }}</td>
+        <td>
+            <a href="{{ url_for('edit_dividend', id=item.id) }}">Edit</a>
+            <form action="{{ url_for('delete_dividend', id=item.id) }}" method="post" style="display:inline;">
+                <button type="submit">Delete</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}
+
+<!-- Bonus Summary -->
+{% if selected_report_type == 'all' or selected_report_type == 'bonuses' %}
+<h3>🎁 Bonus Summary</h3>
+<table>
+    <tr>
+        <th>Item</th>
+        <th>Bonus Date</th>
+        <th>Bonus Quantity</th>
+        <th>Actions</th>
+    </tr>
+    {% for item in bonuses %}
+    <tr>
+        <td>{{ item.item_name }}</td>
+        <td>{{ item.bonus_date | format_date }}</td>
+        <td>{{ item.bonus_quantity }}</td>
+        <td>
+            <a href="{{ url_for('edit_bonus', id=item.id) }}">Edit</a>
+            <form action="{{ url_for('delete_bonus', id=item.id) }}" method="post" style="display:inline;">
+                <button type="submit">Delete</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}
+
+<!-- Item Summary -->
+{% if selected_report_type == 'all' or selected_report_type == 'item_summary' %}
+<h3>📦 Item Summary</h3>
+<table>
+    <tr>
+        <th>Item</th>
+        <th>Total Buy Quantity</th>
+        <th>Total Buy Cost</th>
+        <th>Total Sell Quantity</th>
+        <th>Total Sell Cost</th>
+        <th>Total Bonus Quantity</th>
+        <th>Item Left</th>
+        <th>Cost for Left Items</th>
+        <th>Average Cost for Left Items</th>
+    </tr>
+    {% for item, summary in item_summary.items() %}
+    <tr>
+        <td>{{ item }}</td>
+        <td>{{ summary.total_buy_quantity + summary.total_ipo_quantity }}</td>
+        <td>${{ "%.2f"|format(summary.total_buy_cost_with_commission + summary.total_ipo_cost) }}</td>
+        <td>{{ summary.total_sell_quantity }}</td>
+        <td>${{ "%.2f"|format(summary.total_sell_cost_with_commission) }}</td>
+        <td>{{ summary.total_bonus_quantity }}</td>
+        <td>{{ (summary.total_buy_quantity + summary.total_ipo_quantity + summary.total_bonus_quantity) - summary.total_sell_quantity }}</td>
+        <td>
+            {% set item_left = (summary.total_buy_quantity + summary.total_ipo_quantity + summary.total_bonus_quantity) - summary.total_sell_quantity %}
+            {% if item_left == 0 %}
+                $0.00
+            {% else %}
+                ${{ "%.2f"|format((summary.total_buy_cost_with_commission + summary.total_ipo_cost) - summary.total_sell_cost_with_commission) }}
+            {% endif %}
+        </td>
+        <td>
+            {% set item_left = (summary.total_buy_quantity + summary.total_ipo_quantity + summary.total_bonus_quantity) - summary.total_sell_quantity %}
+            {% if item_left == 0 %}
+                $0.00
+            {% else %}
+                ${{ "%.2f"|format(((summary.total_buy_cost_with_commission + summary.total_ipo_cost) - summary.total_sell_cost_with_commission) / item_left) }}
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}
+
+<!-- Profit/Loss Summary -->
+{% if selected_report_type == 'all' or selected_report_type == 'profit_loss' %}
+<h3>📉 Profit/Loss Summary</h3>
+<table>
+    <tr>
+        <th>Item</th>
+        <th>Total Buy Cost</th>
+        <th>Total Sell Cost</th>
+        <th>Total Dividend Earned</th>
+        <th>Profit/Loss</th>
+    </tr>
+    {% for item, summary in item_summary.items() %}
+    <tr>
+        <td>{{ item }}</td>
+        <td>${{ "%.2f"|format(summary.total_buy_cost_with_commission + summary.total_ipo_cost) }}</td>
+        <td>${{ "%.2f"|format(summary.total_sell_cost_with_commission) }}</td>
+        <td>${{ "%.2f"|format(summary.total_dividend) }}</td>
+        <td>
+            {% set profit_loss = (summary.total_sell_cost_with_commission + summary.total_dividend) - (summary.total_buy_cost_with_commission + summary.total_ipo_cost) %}
+            {% if profit_loss >= 0 %}
+                <span style="color: green;">${{ "%.2f"|format(profit_loss) }} (Profit)</span>
+            {% else %}
+                <span style="color: red;">${{ "%.2f"|format(profit_loss) }} (Loss)</span>
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}
+
+<a href="{{ url_for('index') }}" class="button">🔙 Back to Home</a>
+{% endblock %}

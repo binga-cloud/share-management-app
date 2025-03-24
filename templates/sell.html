@@ -1,0 +1,58 @@
+{% extends 'layout.html' %}
+{% block content %}
+<h2>Enter Share Sale</h2>
+<form action="{{ url_for('sell_share') }}" method="post">
+    {{ form.hidden_tag() }}
+    <div>
+        {{ form.item_selection.label }}<br>
+        {{ form.item_selection(id="item_selection") }}<br>
+        <button type="button" onclick="toggleManualEntry()">Or Enter New Item</button><br>
+    </div>
+    <div id="manual_entry" style="display: none;">
+        {{ form.item_name.label }}<br>
+        {{ form.item_name(size=32) }}<br>
+        {% for error in form.item_name.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <div>
+        {{ form.sell_date.label }}<br>
+        {{ form.sell_date(size=32) }}<br>
+        {% for error in form.sell_date.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <div>
+        {{ form.sell_quantity.label }}<br>
+        {{ form.sell_quantity(size=32) }}<br>
+        {% for error in form.sell_quantity.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <div>
+        {{ form.sell_rate.label }}<br>
+        {{ form.sell_rate(size=32) }}<br>
+        {% for error in form.sell_rate.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <div>
+        {{ form.submit() }}
+    </div>
+</form>
+<a href="{{ url_for('index') }}">Back to Home</a>
+
+<script>
+    function toggleManualEntry() {
+        const manualEntry = document.getElementById("manual_entry");
+        const itemSelection = document.getElementById("item_selection");
+        if (manualEntry.style.display === "none") {
+            manualEntry.style.display = "block";
+            itemSelection.disabled = true;
+        } else {
+            manualEntry.style.display = "none";
+            itemSelection.disabled = false;
+        }
+    }
+</script>
+{% endblock %}

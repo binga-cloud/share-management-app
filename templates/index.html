@@ -1,0 +1,12 @@
+{% extends 'layout.html' %}
+{% block content %}
+<h2>Welcome to Share Management</h2>
+<div class="button-container">
+    <a href="{{ url_for('buy_share') }}" class="button">Buy Shares</a>
+    <a href="{{ url_for('sell_share') }}" class="button">Sell Shares</a>
+    <a href="{{ url_for('add_ipo') }}" class="button">Add IPO Shares</a>
+    <a href="{{ url_for('add_dividend') }}" class="button">Add Dividend</a>
+    <a href="{{ url_for('add_bonus') }}" class="button">Add Bonus Shares</a>  <!-- Add Bonus Shares button -->
+    <a href="{{ url_for('report') }}" class="button">View Report</a>
+</div>
+{% endblock %}

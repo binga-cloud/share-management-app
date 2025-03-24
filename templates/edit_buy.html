@@ -1,0 +1,39 @@
+{% extends 'layout.html' %}
+{% block content %}
+<h2>Edit Share Purchase</h2>
+<form action="{{ url_for('edit_buy', id=entry.id) }}" method="post">
+    {{ form.hidden_tag() }}
+    <div>
+        {{ form.item_name.label }}<br>
+        {{ form.item_name(size=32) }}<br>
+        {% for error in form.item_name.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <div>
+        {{ form.buy_date.label }}<br>
+        {{ form.buy_date(size=32) }}<br>
+        {% for error in form.buy_date.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <div>
+        {{ form.buy_quantity.label }}<br>
+        {{ form.buy_quantity(size=32) }}<br>
+        {% for error in form.buy_quantity.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <div>
+        {{ form.buy_rate.label }}<br>
+        {{ form.buy_rate(size=32) }}<br>
+        {% for error in form.buy_rate.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <div>
+        {{ form.submit() }}
+    </div>
+</form>
+<a href="{{ url_for('report') }}">Back to Report</a>
+{% endblock %}

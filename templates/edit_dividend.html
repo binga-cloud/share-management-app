@@ -1,0 +1,25 @@
+{% extends 'layout.html' %}
+{% block content %}
+<h2>Edit Dividend</h2>
+<form action="{{ url_for('edit_dividend', id=entry.id) }}" method="post">
+    {{ form.hidden_tag() }}
+    <div>
+        {{ form.item_name.label }}<br>
+        {{ form.item_name(size=32) }}<br>
+        {% for error in form.item_name.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <div>
+        {{ form.dividend_amount.label }}<br>
+        {{ form.dividend_amount(size=32) }}<br>
+        {% for error in form.dividend_amount.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <div>
+        {{ form.submit() }}
+    </div>
+</form>
+<a href="{{ url_for('report') }}">Back to Report</a>
+{% endblock %}
