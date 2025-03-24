@@ -1,14 +1,26 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
+from flask_login import LoginManager, current_user, login_user, logout_user, login_required
+from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
 from config import Config
-from models import db, SharePurchase, ShareSale, Dividend, IPOShares, BonusShares
-from forms import BuyForm, SellForm, DividendForm, EditBuyForm, EditSellForm, EditDividendForm, IPOForm, BonusForm
+from models import db, SharePurchase, ShareSale, Dividend, IPOShares, BonusShares, User
+from forms import BuyForm, SellForm, DividendForm, EditBuyForm, EditSellForm, EditDividendForm, IPOForm, BonusForm, RegistrationForm, LoginForm
 from datetime import datetime
 
-# Create the Flask app
 app = Flask(__name__)
 app.config.from_object(Config)
+app.config['SECRET_KEY'] = 'your-secret-key'  # Replace with a strong secret key
+
+# Initialize Flask-Login and Bcrypt
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'  # Redirect to the login page if unauthorized
 db.init_app(app)
+bcrypt = Bcrypt(app)
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 # Custom template filter for date formatting
 def format_date(value, format='%d-%m-%Y'):
@@ -25,9 +37,49 @@ with app.app_context():
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html', current_user=current_user)
+
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        user = User(username=form.username.data)
+        user.set_password(form.password.data)
+        db.session.add(user)
+        db.session.commit()
+        flash('Registration successful! Please log in.', 'success')
+        return redirect(url_for('login'))
+    return render_template('register.html', form=form)
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(username=form.username.data).first()
+        if user and user.check_password(form.password.data):
+            login_user(user)
+            return redirect(url_for('index'))
+        else:
+            flash('Invalid username or password.', 'danger')
+    return render_template('login.html', form=form)
+
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
 
 @app.route('/buy', methods=['GET', 'POST'])
+@login_required
 def buy_share():
     form = BuyForm()
     # Fetch existing items from the database (including IPO items)
@@ -55,6 +107,7 @@ def buy_share():
     return render_template('buy.html', form=form)
 
 @app.route('/ipo', methods=['GET', 'POST'])
+@login_required
 def add_ipo():
     form = IPOForm()
     # Fetch existing items from the database
@@ -83,6 +136,7 @@ def add_ipo():
 
 
 @app.route('/bonus', methods=['GET', 'POST'])
+@login_required
 def add_bonus():
     form = BonusForm()
     # Fetch existing items from the database (including IPO items)
@@ -113,6 +167,7 @@ def add_bonus():
     return render_template('bonus.html', form=form)
 
 @app.route('/sell', methods=['GET', 'POST'])
+@login_required
 def sell_share():
     form = SellForm()
     # Fetch existing items from the database (including IPO items)
@@ -144,6 +199,7 @@ def sell_share():
 
 
 @app.route('/dividend', methods=['GET', 'POST'])
+@login_required
 def add_dividend():
     form = DividendForm()
     # Fetch existing items from the database (including IPO items)
@@ -173,6 +229,7 @@ def add_dividend():
     return render_template('dividend.html', form=form)
 
 @app.route('/edit_buy/<int:id>', methods=['GET', 'POST'])
+@login_required
 def edit_buy(id):
     entry = SharePurchase.query.get_or_404(id)  # Fetch the entry from the database
     form = EditBuyForm(obj=entry)  # Populate the form with the entry data
@@ -184,6 +241,7 @@ def edit_buy(id):
     return render_template('edit_buy.html', form=form, entry=entry)  # Pass 'entry' to the template
 
 @app.route('/edit_ipo/<int:id>', methods=['GET', 'POST'])
+@login_required
 def edit_ipo(id):
     entry = IPOShares.query.get_or_404(id)  # Fetch the IPO entry from the database
     form = IPOForm(obj=entry)  # Populate the form with the entry data
@@ -197,6 +255,7 @@ def edit_ipo(id):
     return render_template('edit_ipo.html', form=form, entry=entry)
 
 @app.route('/edit_sell/<int:id>', methods=['GET', 'POST'])
+@login_required
 def edit_sell(id):
     entry = ShareSale.query.get_or_404(id)  # Fetch the entry from the database
     form = EditSellForm(obj=entry)  # Populate the form with the entry data
@@ -208,6 +267,7 @@ def edit_sell(id):
     return render_template('edit_sell.html', form=form, entry=entry)  # Pass 'entry' to the template
 
 @app.route('/edit_dividend/<int:id>', methods=['GET', 'POST'])
+@login_required
 def edit_dividend(id):
     entry = Dividend.query.get_or_404(id)  # Fetch the entry from the database
     form = EditDividendForm(obj=entry)  # Populate the form with the entry data
@@ -219,6 +279,7 @@ def edit_dividend(id):
     return render_template('edit_dividend.html', form=form, entry=entry)  # Pass 'entry' to the template
 
 @app.route('/delete_buy/<int:id>', methods=['POST'])
+@login_required
 def delete_buy(id):
     entry = SharePurchase.query.get_or_404(id)
     db.session.delete(entry)
@@ -227,6 +288,7 @@ def delete_buy(id):
     return redirect(url_for('report'))
 
 @app.route('/delete_ipo/<int:id>', methods=['POST'])
+@login_required
 def delete_ipo(id):
     entry = IPOShares.query.get_or_404(id)
     db.session.delete(entry)
@@ -235,6 +297,7 @@ def delete_ipo(id):
     return redirect(url_for('report'))
 
 @app.route('/delete_sell/<int:id>', methods=['POST'])
+@login_required
 def delete_sell(id):
     entry = ShareSale.query.get_or_404(id)
     db.session.delete(entry)
@@ -243,6 +306,7 @@ def delete_sell(id):
     return redirect(url_for('report'))
 
 @app.route('/delete_dividend/<int:id>', methods=['POST'])
+@login_required
 def delete_dividend(id):
     entry = Dividend.query.get_or_404(id)
     db.session.delete(entry)
@@ -251,6 +315,7 @@ def delete_dividend(id):
     return redirect(url_for('report'))
 
 @app.route('/edit_bonus/<int:id>', methods=['GET', 'POST'])
+@login_required
 def edit_bonus(id):
     entry = BonusShares.query.get_or_404(id)  # Fetch the bonus entry from the database
     form = BonusForm(obj=entry)  # Populate the form with the entry data
@@ -263,6 +328,7 @@ def edit_bonus(id):
     return render_template('edit_bonus.html', form=form, entry=entry)
 
 @app.route('/delete_bonus/<int:id>', methods=['POST'])
+@login_required
 def delete_bonus(id):
     entry = BonusShares.query.get_or_404(id)
     db.session.delete(entry)
@@ -286,6 +352,7 @@ def get_previous_records():
     return jsonify(previous_records)
 
 @app.route('/report')
+@login_required
 def report():
     item_name = request.args.get('item_name', 'all')  # Default to 'all' if no item is selected
     report_type = request.args.get('report_type', 'all')  # Default to 'all' if no report type is selected
@@ -432,9 +499,6 @@ def report():
         selected_item=item_name,
         selected_report_type=report_type
     )
-
-if __name__ == '__main__':
-    app.run(debug=True)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)

@@ -1,6 +1,17 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, IntegerField, FloatField, SubmitField, DateField, SelectField
-from wtforms.validators import DataRequired, Optional
+from wtforms import StringField, IntegerField, FloatField, SubmitField, DateField, SelectField, PasswordField
+from wtforms.validators import DataRequired, Optional, Length, EqualTo
+
+class RegistrationForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired(), Length(min=4, max=20)])
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
+    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
+    submit = SubmitField('Sign Up')
+
+class LoginForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    submit = SubmitField('Login')
 
 class BuyForm(FlaskForm):
     item_selection = SelectField('Select Item', choices=[], validators=[Optional()])  # Dropdown for existing items
