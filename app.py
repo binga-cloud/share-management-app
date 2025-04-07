@@ -6,7 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 from config import Config
 from models import db, SharePurchase, ShareSale, Dividend, IPOShares, BonusShares, User
 from forms import BuyForm, SellForm, DividendForm, EditBuyForm, EditSellForm, EditDividendForm, IPOForm, BonusForm, \
-    RegistrationForm, LoginForm
+    RegistrationForm, LoginForm, ChangePasswordForm
 from datetime import datetime
 
 app = Flask(__name__)
@@ -99,6 +99,19 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
+@app.route('/change_password', methods=['GET', 'POST'])
+@login_required
+def change_password():
+    form = ChangePasswordForm()
+    if form.validate_on_submit():
+        if current_user.check_password(form.current_password.data):
+            current_user.set_password(form.new_password.data)
+            db.session.commit()
+            flash('Your password has been updated!', 'success')
+            return redirect(url_for('index'))
+        else:
+            flash('Current password is incorrect.', 'danger')
+    return render_template('change_password.html', form=form)
 
 # ========================
 # TRANSACTION ROUTES (ALL UPDATED)
