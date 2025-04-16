@@ -1,45 +1,38 @@
-/* Modern Glassmorphism - Responsive for ALL Devices */
+/* Modern Glassmorphism - Mobile First Design */
 body {
     font-family: 'Poppins', sans-serif;
     background: linear-gradient(135deg, #e0c3fc, #8ec5fc);
     color: #2c3e50;
     margin: 0;
-    padding: 0;
+    padding: 10px;
+    font-size: 18px;
     line-height: 1.6;
     min-height: 100vh;
-    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
 }
 
-/* Container - Works on Mobile & Desktop */
+/* Container */
 .container {
     width: 95%;
-    max-width: 1100px;
-    margin: 20px auto;
-    padding: 25px;
+    margin: 15px auto;
+    padding: 20px;
     background: rgba(255, 255, 255, 0.25);
-    backdrop-filter: blur(20px);
+    backdrop-filter: blur(15px);
     border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.3);
-    animation: fadeIn 0.5s ease-out;
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* Navigation - Responsive */
+/* Navigation */
 .navbar {
     background: rgba(255, 255, 255, 0.3);
-    padding: 15px;
+    padding: 12px 15px;
     border-radius: 12px;
+    margin-bottom: 20px;
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: center;
     gap: 10px;
-    margin-bottom: 25px;
+    justify-content: center;
     backdrop-filter: blur(10px);
 }
 
@@ -54,37 +47,30 @@ body {
 
 .navbar a:hover {
     background: rgba(255, 255, 255, 0.5);
-    transform: translateY(-2px);
 }
 
-/* Buttons - Perfect for Touch & Mouse */
-.button, button, input[type="submit"] {
+/* Buttons */
+.button, input[type="submit"], button {
     background: linear-gradient(90deg, #3a47d5, #00d4ff);
     color: white;
     border: none;
-    padding: 14px 25px;
-    font-size: 16px;
+    padding: 16px 24px;
+    font-size: 18px;
     border-radius: 10px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    display: inline-block;
+    margin: 10px 0;
+    width: 100%;
+    display: block;
     text-align: center;
-    margin: 8px 0;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
-.button:hover, button:hover {
-    transform: translateY(-3px) scale(1.03);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-}
-
-/* Tables - Scrollable on Mobile */
+/* Tables - Mobile Optimized */
 table {
     width: 100%;
     border-collapse: collapse;
-    margin: 25px 0;
+    margin: 20px 0;
+    font-size: 16px;
     background: rgba(255, 255, 255, 0.4);
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
     border-radius: 12px;
     overflow: hidden;
 }
@@ -100,60 +86,83 @@ table th {
     font-weight: 700;
 }
 
-/* Forms - Mobile-Friendly */
-input, select, textarea {
+/* Forms */
+input, select {
     width: 100%;
-    padding: 14px;
+    padding: 15px;
     margin: 10px 0;
-    border-radius: 8px;
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    background: rgba(255, 255, 255, 0.8);
+    border-radius: 10px;
+    border: 1px solid #ddd;
     font-size: 16px;
-    box-sizing: border-box;
+    background: rgba(255, 255, 255, 0.8);
 }
 
-/* Mobile-Specific Tweaks */
+/* Mobile-Specific Table Improvements */
 @media (max-width: 768px) {
-    body {
-        font-size: 18px;
-        padding: 10px;
-    }
-
-    .container {
-        width: 100%;
-        padding: 20px;
-        border-radius: 15px;
-    }
-
-    .navbar {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .button, button, input[type="submit"] {
-        width: 100%;
-        padding: 16px;
-        font-size: 18px;
-    }
-
     table {
         display: block;
         overflow-x: auto;
-        font-size: 15px;
+        -webkit-overflow-scrolling: touch;
+        white-space: nowrap;
+    }
+
+    table tr {
+        display: inline-block;
+        min-width: 100%;
+        margin-bottom: 0;
+    }
+
+    table td {
+        display: block;
+        text-align: right;
+        padding: 12px 15px;
+        border-bottom: 1px solid rgba(0,0,0,0.1);
+    }
+
+    table td:before {
+        content: attr(data-label);
+        float: left;
+        font-weight: bold;
+        color: #3a47d5;
     }
 }
 
-/* Desktop Enhancements */
+/* Desktop Adjustments */
 @media (min-width: 1024px) {
+    body {
+        padding: 20px;
+    }
+
     .container {
-        padding: 30px;
+        width: 90%;
+        max-width: 1100px;
     }
 
     .navbar {
-        padding: 15px 25px;
+        justify-content: space-between;
+        flex-wrap: nowrap;
     }
 
-    table th, table td {
-        padding: 18px;
+    .button, input[type="submit"], button {
+        width: auto;
+        display: inline-block;
+    }
+
+    table {
+        display: table;
+        white-space: normal;
+    }
+
+    table tr {
+        display: table-row;
+    }
+
+    table td {
+        display: table-cell;
+        text-align: left;
+    }
+
+    table td:before {
+        content: none;
     }
 }
