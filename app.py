@@ -590,6 +590,13 @@ def get_previous_records():
 
     return jsonify(previous_records)
 
+@app.route('/static/sw.js')
+def serve_sw():
+    return app.send_static_file('sw.js'), 200, {'Content-Type': 'application/javascript'}
+
+@app.route('/static/manifest.json')
+def serve_manifest():
+    return app.send_static_file('manifest.json'), 200, {'Content-Type': 'application/json'}
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
