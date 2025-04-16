@@ -130,7 +130,7 @@ def buy_share():
 
     for entry in purchases + sales + dividends + ipos:
         existing_items.add(entry.item_name)
-    form.item_selection.choices = [(item, item) for item in existing_items]
+    form.item_selection.choices = [(item, item) for item in sorted(existing_items)]
 
     if form.validate_on_submit():
         item_name = form.item_selection.data if form.item_selection.data else form.item_name.data
@@ -222,7 +222,7 @@ def add_ipo():
 
     for entry in purchases + sales + dividends + ipos:
         existing_items.add(entry.item_name)
-    form.item_selection.choices = [(item, item) for item in existing_items]
+    form.item_selection.choices = [(item, item) for item in sorted(existing_items)]
 
     if form.validate_on_submit():
         item_name = form.item_selection.data if form.item_selection.data else form.item_name.data

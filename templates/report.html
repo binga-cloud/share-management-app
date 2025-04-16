@@ -1,257 +1,380 @@
 {% extends 'layout.html' %}
+
 {% block content %}
 <h2>📊 Share Report</h2>
 
-<!-- Filter by Item -->
-<form method="get" action="{{ url_for('report') }}">
-    <label for="item_name">Filter by Item:</label>
-    <select name="item_name" id="item_name" onchange="this.form.submit()">
-        <option value="all" {% if not selected_item %}selected{% endif %}>All Items</option>
-        {% for item in unique_items %}
-            <option value="{{ item }}" {% if selected_item == item %}selected{% endif %}>{{ item }}</option>
-        {% endfor %}
-    </select>
-    <!-- Hidden input to preserve the report_type filter -->
-    <input type="hidden" name="report_type" value="{{ selected_report_type }}">
-</form>
+<!-- Filters -->
+<div class="filters">
+    <form method="get" action="{{ url_for('report') }}">
+        <div class="filter-group">
+            <label for="item_name">Filter by Item:</label>
+            <select name="item_name" id="item_name" onchange="this.form.submit()">
+                <option value="all" {% if not selected_item %}selected{% endif %}>All Items</option>
+                {% for item in unique_items %}
+                    <option value="{{ item }}" {% if selected_item == item %}selected{% endif %}>{{ item }}</option>
+                {% endfor %}
+            </select>
+        </div>
 
-<!-- Filter by Report -->
-<form method="get" action="{{ url_for('report') }}">
-    <label for="report_type">Filter by Report:</label>
-    <select name="report_type" id="report_type" onchange="this.form.submit()">
-        <option value="all" {% if not selected_report_type %}selected{% endif %}>All Reports</option>
-        <option value="purchases" {% if selected_report_type == 'purchases' %}selected{% endif %}>Purchases</option>
-        <option value="sales" {% if selected_report_type == 'sales' %}selected{% endif %}>Sales</option>
-        <option value="dividends" {% if selected_report_type == 'dividends' %}selected{% endif %}>Dividends</option>
-        <option value="ipos" {% if selected_report_type == 'ipos' %}selected{% endif %}>IPOs</option>
-        <option value="bonuses" {% if selected_report_type == 'bonuses' %}selected{% endif %}>Bonus Shares</option>
-        <option value="item_summary" {% if selected_report_type == 'item_summary' %}selected{% endif %}>Item Summary</option>
-        <option value="profit_loss" {% if selected_report_type == 'profit_loss' %}selected{% endif %}>Profit/Loss Summary</option>
-    </select>
-    <!-- Hidden input to preserve the item_name filter -->
-    <input type="hidden" name="item_name" value="{{ selected_item }}">
-</form>
+        <div class="filter-group">
+            <label for="report_type">Filter by Report:</label>
+            <select name="report_type" id="report_type" onchange="this.form.submit()">
+                <option value="all" {% if not selected_report_type %}selected{% endif %}>All Reports</option>
+                <option value="purchases" {% if selected_report_type == 'purchases' %}selected{% endif %}>Purchases</option>
+                <option value="sales" {% if selected_report_type == 'sales' %}selected{% endif %}>Sales</option>
+                <option value="dividends" {% if selected_report_type == 'dividends' %}selected{% endif %}>Dividends</option>
+                <option value="ipos" {% if selected_report_type == 'ipos' %}selected{% endif %}>IPOs</option>
+                <option value="bonuses" {% if selected_report_type == 'bonuses' %}selected{% endif %}>Bonus Shares</option>
+                <option value="item_summary" {% if selected_report_type == 'item_summary' %}selected{% endif %}>Item Summary</option>
+                <option value="profit_loss" {% if selected_report_type == 'profit_loss' %}selected{% endif %}>Profit/Loss</option>
+            </select>
+        </div>
+    </form>
+</div>
 
 <!-- Purchase Summary -->
-{% if selected_report_type == 'all' or selected_report_type == 'purchases' %}
-<h3>🛒 Purchase Summary</h3>
-<table>
-    <tr>
-        <th>Item</th>
-        <th>Purchase Date</th>
-        <th>Purchased Quantity</th>
-        <th>Purchase Rate</th>
-        <th>Total Purchased Cost</th>
-        <th>Actions</th>
-    </tr>
-    {% for item in purchases %}
-    <tr>
-        <td>{{ item.item_name }}</td>
-        <td>{{ item.buy_date | format_date }}</td>
-        <td>{{ item.buy_quantity }}</td>
-        <td>${{ "%.2f"|format(item.buy_rate) }}</td>
-        <td>${{ "%.2f"|format(item.buy_quantity * item.buy_rate * 1.004) }}</td>
-        <td>
-            <a href="{{ url_for('edit_buy', id=item.id) }}">Edit</a>
-            <form action="{{ url_for('delete_buy', id=item.id) }}" method="post" style="display:inline;">
-                <button type="submit">Delete</button>
-            </form>
-        </td>
-    </tr>
-    {% endfor %}
-</table>
+{% if (selected_report_type == 'all' or selected_report_type == 'purchases') and purchases %}
+<div class="report-section">
+    <h3>🛒 Purchase Summary</h3>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Date</th>
+                    <th>Quantity</th>
+                    <th>Rate</th>
+                    <th>Total Cost</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in purchases %}
+                <tr>
+                    <td data-label="Item">{{ item.item_name }}</td>
+                    <td data-label="Date">{{ item.buy_date | format_date }}</td>
+                    <td data-label="Quantity">{{ item.buy_quantity }}</td>
+                    <td data-label="Rate">${{ "%.2f"|format(item.buy_rate) }}</td>
+                    <td data-label="Total Cost">${{ "%.2f"|format(item.buy_quantity * item.buy_rate * 1.004) }}</td>
+                    <td data-label="Actions" class="actions">
+                        <a href="{{ url_for('edit_buy', id=item.id) }}" class="action-btn">Edit</a>
+                        <form action="{{ url_for('delete_buy', id=item.id) }}" method="post" style="display:inline;">
+                            <button type="submit" class="action-btn delete">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 {% endif %}
 
 <!-- Sales Summary -->
-{% if selected_report_type == 'all' or selected_report_type == 'sales' %}
-<h3>💰 Sales Summary</h3>
-<table>
-    <tr>
-        <th>Item</th>
-        <th>Sell Date</th>
-        <th>Sold Quantity</th>
-        <th>Sale Rate</th>
-        <th>Total Sell Amount</th>
-        <th>Actions</th>
-    </tr>
-    {% for item in sales %}
-    <tr>
-        <td>{{ item.item_name }}</td>
-        <td>{{ item.sell_date | format_date }}</td>
-        <td>{{ item.sell_quantity }}</td>
-        <td>${{ "%.2f"|format(item.sell_rate) }}</td>
-        <td>${{ "%.2f"|format(item.sell_quantity * item.sell_rate * 0.996) }}</td>
-        <td>
-            <a href="{{ url_for('edit_sell', id=item.id) }}">Edit</a>
-            <form action="{{ url_for('delete_sell', id=item.id) }}" method="post" style="display:inline;">
-                <button type="submit">Delete</button>
-            </form>
-        </td>
-    </tr>
-    {% endfor %}
-</table>
-{% endif %}
-
-<!-- IPO Summary -->
-{% if selected_report_type == 'all' or selected_report_type == 'ipos' %}
-<h3>📈 IPO Summary</h3>
-<table>
-    <tr>
-        <th>Item</th>
-        <th>IPO Date</th>
-        <th>IPO Quantity</th>
-        <th>IPO Rate</th>
-        <th>Total IPO Cost</th>
-        <th>Actions</th>
-    </tr>
-    {% for item in ipos %}
-    <tr>
-        <td>{{ item.item_name }}</td>
-        <td>{{ item.ipo_date | format_date }}</td>
-        <td>{{ item.ipo_quantity }}</td>
-        <td>${{ "%.2f"|format(item.ipo_rate) }}</td>
-        <td>${{ "%.2f"|format(item.ipo_quantity * item.ipo_rate) }}</td>
-        <td>
-            <a href="{{ url_for('edit_ipo', id=item.id) }}">Edit</a>
-            <form action="{{ url_for('delete_ipo', id=item.id) }}" method="post" style="display:inline;">
-                <button type="submit">Delete</button>
-            </form>
-        </td>
-    </tr>
-    {% endfor %}
-</table>
+{% if (selected_report_type == 'all' or selected_report_type == 'sales') and sales %}
+<div class="report-section">
+    <h3>💰 Sales Summary</h3>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Date</th>
+                    <th>Quantity</th>
+                    <th>Rate</th>
+                    <th>Total Amount</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in sales %}
+                <tr>
+                    <td data-label="Item">{{ item.item_name }}</td>
+                    <td data-label="Date">{{ item.sell_date | format_date }}</td>
+                    <td data-label="Quantity">{{ item.sell_quantity }}</td>
+                    <td data-label="Rate">${{ "%.2f"|format(item.sell_rate) }}</td>
+                    <td data-label="Total Amount">${{ "%.2f"|format(item.sell_quantity * item.sell_rate * 0.996) }}</td>
+                    <td data-label="Actions" class="actions">
+                        <a href="{{ url_for('edit_sell', id=item.id) }}" class="action-btn">Edit</a>
+                        <form action="{{ url_for('delete_sell', id=item.id) }}" method="post" style="display:inline;">
+                            <button type="submit" class="action-btn delete">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 {% endif %}
 
 <!-- Dividend Summary -->
-{% if selected_report_type == 'all' or selected_report_type == 'dividends' %}
-<h3>💵 Dividend Summary</h3>
-<table>
-    <tr>
-        <th>Item</th>
-        <th>Dividend Date</th>
-        <th>Total Dividend Earned</th>
-        <th>Actions</th>
-    </tr>
-    {% for item in dividends %}
-    <tr>
-        <td>{{ item.item_name }}</td>
-        <td>{{ item.dividend_date | format_date }}</td>
-        <td>${{ "%.2f"|format(item.dividend_amount) }}</td>
-        <td>
-            <a href="{{ url_for('edit_dividend', id=item.id) }}">Edit</a>
-            <form action="{{ url_for('delete_dividend', id=item.id) }}" method="post" style="display:inline;">
-                <button type="submit">Delete</button>
-            </form>
-        </td>
-    </tr>
-    {% endfor %}
-</table>
+{% if (selected_report_type == 'all' or selected_report_type == 'dividends') and dividends %}
+<div class="report-section">
+    <h3>💵 Dividend Summary</h3>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Date</th>
+                    <th>Amount</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in dividends %}
+                <tr>
+                    <td data-label="Item">{{ item.item_name }}</td>
+                    <td data-label="Date">{{ item.dividend_date | format_date }}</td>
+                    <td data-label="Amount">${{ "%.2f"|format(item.dividend_amount) }}</td>
+                    <td data-label="Actions" class="actions">
+                        <a href="{{ url_for('edit_dividend', id=item.id) }}" class="action-btn">Edit</a>
+                        <form action="{{ url_for('delete_dividend', id=item.id) }}" method="post" style="display:inline;">
+                            <button type="submit" class="action-btn delete">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+<!-- IPO Summary -->
+{% if (selected_report_type == 'all' or selected_report_type == 'ipos') and ipos %}
+<div class="report-section">
+    <h3>📈 IPO Summary</h3>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Date</th>
+                    <th>Quantity</th>
+                    <th>Rate</th>
+                    <th>Total Cost</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in ipos %}
+                <tr>
+                    <td data-label="Item">{{ item.item_name }}</td>
+                    <td data-label="Date">{{ item.ipo_date | format_date }}</td>
+                    <td data-label="Quantity">{{ item.ipo_quantity }}</td>
+                    <td data-label="Rate">${{ "%.2f"|format(item.ipo_rate) }}</td>
+                    <td data-label="Total Cost">${{ "%.2f"|format(item.ipo_quantity * item.ipo_rate) }}</td>
+                    <td data-label="Actions" class="actions">
+                        <a href="{{ url_for('edit_ipo', id=item.id) }}" class="action-btn">Edit</a>
+                        <form action="{{ url_for('delete_ipo', id=item.id) }}" method="post" style="display:inline;">
+                            <button type="submit" class="action-btn delete">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 {% endif %}
 
 <!-- Bonus Summary -->
-{% if selected_report_type == 'all' or selected_report_type == 'bonuses' %}
-<h3>🎁 Bonus Summary</h3>
-<table>
-    <tr>
-        <th>Item</th>
-        <th>Bonus Date</th>
-        <th>Bonus Quantity</th>
-        <th>Actions</th>
-    </tr>
-    {% for item in bonuses %}
-    <tr>
-        <td>{{ item.item_name }}</td>
-        <td>{{ item.bonus_date | format_date }}</td>
-        <td>{{ item.bonus_quantity }}</td>
-        <td>
-            <a href="{{ url_for('edit_bonus', id=item.id) }}">Edit</a>
-            <form action="{{ url_for('delete_bonus', id=item.id) }}" method="post" style="display:inline;">
-                <button type="submit">Delete</button>
-            </form>
-        </td>
-    </tr>
-    {% endfor %}
-</table>
+{% if (selected_report_type == 'all' or selected_report_type == 'bonuses') and bonuses %}
+<div class="report-section">
+    <h3>🎁 Bonus Summary</h3>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Date</th>
+                    <th>Quantity</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in bonuses %}
+                <tr>
+                    <td data-label="Item">{{ item.item_name }}</td>
+                    <td data-label="Date">{{ item.bonus_date | format_date }}</td>
+                    <td data-label="Quantity">{{ item.bonus_quantity }}</td>
+                    <td data-label="Actions" class="actions">
+                        <a href="{{ url_for('edit_bonus', id=item.id) }}" class="action-btn">Edit</a>
+                        <form action="{{ url_for('delete_bonus', id=item.id) }}" method="post" style="display:inline;">
+                            <button type="submit" class="action-btn delete">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 {% endif %}
 
 <!-- Item Summary -->
-{% if selected_report_type == 'all' or selected_report_type == 'item_summary' %}
-<h3>📦 Item Summary</h3>
-<table>
-    <tr>
-        <th>Item</th>
-        <th>Total Buy Quantity</th>
-        <th>Total Buy Cost</th>
-        <th>Total Sell Quantity</th>
-        <th>Total Sell Cost</th>
-        <th>Total Bonus Quantity</th>
-        <th>Total Dividends</th>
-        <th>Item Left</th>
-        <th>Net Cost (After Dividends)</th>
-        <th>Net Avg Cost</th>
-    </tr>
-    {% for item, summary in item_summary.items() %}
-    <tr>
-        <td>{{ item }}</td>
-        <td>{{ summary.total_buy_quantity + summary.total_ipo_quantity }}</td>
-        <td>${{ "%.2f"|format(summary.total_buy_cost_with_commission + summary.total_ipo_cost) }}</td>
-        <td>{{ summary.total_sell_quantity }}</td>
-        <td>${{ "%.2f"|format(summary.total_sell_cost_with_commission) }}</td>
-        <td>{{ summary.total_bonus_quantity }}</td>
-        <td>${{ "%.2f"|format(summary.total_dividend) }}</td>
-        <td>
-            {% set item_left = (summary.total_buy_quantity + summary.total_ipo_quantity + summary.total_bonus_quantity) - summary.total_sell_quantity %}
-            {{ item_left }}
-        </td>
-        <td>
-            {% if item_left == 0 %}
-                $0.00
-            {% else %}
-                {% set net_cost = (summary.total_buy_cost_with_commission + summary.total_ipo_cost) - summary.total_sell_cost_with_commission - summary.total_dividend %}
-                ${{ "%.2f"|format(net_cost) }}
-            {% endif %}
-        </td>
-        <td>
-            {% if item_left == 0 %}
-                $0.00
-            {% else %}
-                ${{ "%.2f"|format(net_cost / item_left) }}
-            {% endif %}
-        </td>
-    </tr>
-    {% endfor %}
-</table>
+{% if (selected_report_type == 'all' or selected_report_type == 'item_summary') and item_summary %}
+<div class="report-section">
+    <h3>📦 Item Summary</h3>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Total Bought</th>
+                    <th>Total Sold</th>
+                    <th>Bonus</th>
+                    <th>Current Holding</th>
+                    <th>Avg Cost</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item, summary in item_summary.items() %}
+                {% set current_holding = (summary.total_buy_quantity + summary.total_ipo_quantity + summary.total_bonus_quantity) - summary.total_sell_quantity %}
+                <tr>
+                    <td data-label="Item">{{ item }}</td>
+                    <td data-label="Total Bought">{{ summary.total_buy_quantity + summary.total_ipo_quantity }}</td>
+                    <td data-label="Total Sold">{{ summary.total_sell_quantity }}</td>
+                    <td data-label="Bonus">{{ summary.total_bonus_quantity }}</td>
+                    <td data-label="Current Holding">{{ current_holding }}</td>
+                    <td data-label="Avg Cost">
+                        {% if current_holding > 0 %}
+                            ${{ "%.2f"|format(((summary.total_buy_cost_with_commission + summary.total_ipo_cost) - summary.total_sell_cost_with_commission) / current_holding ) }}
+                        {% else %}
+                            $0.00
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 {% endif %}
 
 <!-- Profit/Loss Summary -->
-{% if selected_report_type == 'all' or selected_report_type == 'profit_loss' %}
-<h3>📉 Profit/Loss Summary</h3>
-<table>
-    <tr>
-        <th>Item</th>
-        <th>Total Buy Cost</th>
-        <th>Total Sell Cost</th>
-        <th>Total Dividend Earned</th>
-        <th>Profit/Loss</th>
-    </tr>
-    {% for item, summary in item_summary.items() %}
-    <tr>
-        <td>{{ item }}</td>
-        <td>${{ "%.2f"|format(summary.total_buy_cost_with_commission + summary.total_ipo_cost) }}</td>
-        <td>${{ "%.2f"|format(summary.total_sell_cost_with_commission) }}</td>
-        <td>${{ "%.2f"|format(summary.total_dividend) }}</td>
-        <td>
-            {% set profit_loss = (summary.total_sell_cost_with_commission + summary.total_dividend) - (summary.total_buy_cost_with_commission + summary.total_ipo_cost) %}
-            {% if profit_loss >= 0 %}
-                <span style="color: green;">${{ "%.2f"|format(profit_loss) }} (Profit)</span>
-            {% else %}
-                <span style="color: red;">${{ "%.2f"|format(profit_loss) }} (Loss)</span>
-            {% endif %}
-        </td>
-    </tr>
-    {% endfor %}
-</table>
+{% if (selected_report_type == 'all' or selected_report_type == 'profit_loss') and item_summary %}
+<div class="report-section">
+    <h3>📉 Profit/Loss Summary</h3>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Total Invested</th>
+                    <th>Total Returns</th>
+                    <th>Dividends</th>
+                    <th>Net P/L</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item, summary in item_summary.items() %}
+                {% set net_pl = (summary.total_sell_cost_with_commission + summary.total_dividend) - (summary.total_buy_cost_with_commission + summary.total_ipo_cost) %}
+                <tr>
+                    <td data-label="Item">{{ item }}</td>
+                    <td data-label="Total Invested">${{ "%.2f"|format(summary.total_buy_cost_with_commission + summary.total_ipo_cost) }}</td>
+                    <td data-label="Total Returns">${{ "%.2f"|format(summary.total_sell_cost_with_commission) }}</td>
+                    <td data-label="Dividends">${{ "%.2f"|format(summary.total_dividend) }}</td>
+                    <td data-label="Net P/L">
+                        {% if net_pl >= 0 %}
+                            <span class="profit">${{ "%.2f"|format(net_pl) }} ▲</span>
+                        {% else %}
+                            <span class="loss">${{ "%.2f"|format(net_pl) }} ▼</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 {% endif %}
 
 <a href="{{ url_for('index') }}" class="button">🔙 Back to Home</a>
+
+<style>
+    /* Mobile-Optimized Styles */
+    .filters {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .filters select {
+        width: 100%;
+        padding: 12px;
+        border-radius: 8px;
+        border: 1px solid rgba(0,0,0,0.1);
+        background: rgba(255,255,255,0.8);
+        font-size: 16px;
+    }
+
+    .report-section {
+        margin-bottom: 30px;
+    }
+
+    .table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin-bottom: 20px;
+    }
+
+    .actions {
+        display: flex;
+        gap: 5px;
+        flex-wrap: wrap;
+    }
+
+    .action-btn {
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-size: 14px;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+
+    .action-btn {
+        background: #3a47d5;
+        color: white;
+    }
+
+    .action-btn.delete {
+        background: #ff4757;
+    }
+
+    .profit {
+        color: #2ecc71;
+        font-weight: bold;
+    }
+
+    .loss {
+        color: #ff4757;
+        font-weight: bold;
+    }
+
+    /* Desktop Adjustments */
+    @media (min-width: 768px) {
+        .filters {
+            flex-direction: row;
+            justify-content: space-between;
+        }
+
+        .filter-group {
+            width: 48%;
+        }
+
+        .actions {
+            flex-wrap: nowrap;
+        }
+    }
+</style>
 {% endblock %}
