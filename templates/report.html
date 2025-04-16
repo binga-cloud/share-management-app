@@ -185,9 +185,10 @@
         <th>Total Sell Quantity</th>
         <th>Total Sell Cost</th>
         <th>Total Bonus Quantity</th>
+        <th>Total Dividends</th>
         <th>Item Left</th>
-        <th>Cost for Left Items</th>
-        <th>Average Cost for Left Items</th>
+        <th>Net Cost (After Dividends)</th>
+        <th>Net Avg Cost</th>
     </tr>
     {% for item, summary in item_summary.items() %}
     <tr>
@@ -197,21 +198,24 @@
         <td>{{ summary.total_sell_quantity }}</td>
         <td>${{ "%.2f"|format(summary.total_sell_cost_with_commission) }}</td>
         <td>{{ summary.total_bonus_quantity }}</td>
-        <td>{{ (summary.total_buy_quantity + summary.total_ipo_quantity + summary.total_bonus_quantity) - summary.total_sell_quantity }}</td>
+        <td>${{ "%.2f"|format(summary.total_dividend) }}</td>
         <td>
             {% set item_left = (summary.total_buy_quantity + summary.total_ipo_quantity + summary.total_bonus_quantity) - summary.total_sell_quantity %}
+            {{ item_left }}
+        </td>
+        <td>
             {% if item_left == 0 %}
                 $0.00
             {% else %}
-                ${{ "%.2f"|format((summary.total_buy_cost_with_commission + summary.total_ipo_cost) - summary.total_sell_cost_with_commission) }}
+                {% set net_cost = (summary.total_buy_cost_with_commission + summary.total_ipo_cost) - summary.total_sell_cost_with_commission - summary.total_dividend %}
+                ${{ "%.2f"|format(net_cost) }}
             {% endif %}
         </td>
         <td>
-            {% set item_left = (summary.total_buy_quantity + summary.total_ipo_quantity + summary.total_bonus_quantity) - summary.total_sell_quantity %}
             {% if item_left == 0 %}
                 $0.00
             {% else %}
-                ${{ "%.2f"|format(((summary.total_buy_cost_with_commission + summary.total_ipo_cost) - summary.total_sell_cost_with_commission) / item_left) }}
+                ${{ "%.2f"|format(net_cost / item_left) }}
             {% endif %}
         </td>
     </tr>
