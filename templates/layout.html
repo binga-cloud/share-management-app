@@ -1,38 +1,36 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Share Management</title>
-    <!-- PWA Required Meta Tags -->
+    <!-- PWA Essentials -->
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Portfolio Tracker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#4a90e2">
-    <meta name="description" content="Stock Portfolio Management Application">
+    <meta name="description" content="Track your stock investments and dividends">
 
-    <!-- PWA Manifest -->
+    <!-- PWA Config -->
     <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <link rel="icon" href="{{ url_for('static', filename='icons/icon-192x192.png') }}">
 
     <!-- iOS Support -->
-    <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/icon-192x192.png') }}">
-    <meta name="apple-mobile-web-app-status-bar" content="#4a90e2">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/icon-192x192.png') }}">
 
-    <!-- Fonts and CSS -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <!-- Fonts & CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='icons/icon-192x192.png') }}">
 </head>
 <body>
     <!-- Navigation Bar -->
     <div class="navbar">
-        <a href="{{ url_for('index') }}" class="app-name">Share Management App</a>
+        <a href="{{ url_for('index') }}" class="app-name">Stock Tracker</a>
         <div class="nav-links">
             {% if current_user.is_authenticated %}
                 {% if current_user.is_admin %}
-                    <a href="{{ url_for('admin_users') }}">Admin Panel</a>
+                    <a href="{{ url_for('admin_users') }}">Admin</a>
                 {% endif %}
-                <a href="{{ url_for('change_password') }}">Change Password</a>
+                <a href="{{ url_for('change_password') }}">Password</a>
                 <a href="{{ url_for('logout') }}">Logout</a>
             {% else %}
                 <a href="{{ url_for('login') }}">Login</a>
@@ -46,17 +44,13 @@
         {% block content %}{% endblock %}
     </div>
 
-    <!-- PWA Service Worker Registration -->
+    <!-- PWA Service Worker -->
     <script>
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
+            window.addEventListener('load', () => {
                 navigator.serviceWorker.register('{{ url_for("static", filename="sw.js") }}')
-                    .then(function(registration) {
-                        console.log('ServiceWorker registration successful');
-                    })
-                    .catch(function(err) {
-                        console.log('ServiceWorker registration failed: ', err);
-                    });
+                    .then(reg => console.log('PWA: Service Worker registered'))
+                    .catch(err => console.log('PWA: Registration failed: ' + err));
             });
         }
     </script>

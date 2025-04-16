@@ -1,231 +1,159 @@
-/* Modern Glassmorphism Styling with Enhanced Aesthetics */
+/* Modern Glassmorphism - Responsive for ALL Devices */
 body {
     font-family: 'Poppins', sans-serif;
     background: linear-gradient(135deg, #e0c3fc, #8ec5fc);
     color: #2c3e50;
     margin: 0;
     padding: 0;
-    line-height: 1.8;
-    font-size: 16px;
+    line-height: 1.6;
     min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    font-size: 16px;
 }
 
-h1, h2, h3 {
-    color: #2c3e50;
-    font-weight: 700;
-    text-align: center;
-    margin: 0 0 20px 0;
-}
-
+/* Container - Works on Mobile & Desktop */
 .container {
-    width: 90%;
+    width: 95%;
     max-width: 1100px;
-    margin: 40px auto;
-    padding: 30px;
+    margin: 20px auto;
+    padding: 25px;
     background: rgba(255, 255, 255, 0.25);
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
     backdrop-filter: blur(20px);
-    border-radius: 25px;
-    animation: fadeIn 1s ease-in-out;
-    text-align: center;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
     border: 1px solid rgba(255, 255, 255, 0.3);
+    animation: fadeIn 0.5s ease-out;
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
+    from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* Navigation Bar with Left and Right Alignment */
+/* Navigation - Responsive */
 .navbar {
-    background: linear-gradient(90deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1));
-    padding: 15px 20px;
-    color: #2c3e50;
-    display: flex;
-    justify-content: space-between; /* Space between left and right items */
-    align-items: center;
+    background: rgba(255, 255, 255, 0.3);
+    padding: 15px;
     border-radius: 12px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(10px);
-    margin-bottom: 20px;
-    width: 100%;
-    max-width: 1100px;
-}
-
-/* Left-aligned App Name */
-.navbar .app-name {
-    font-size: 20px;
-    font-weight: 700;
-    color: #2c3e50;
-    text-decoration: none;
-    transition: all 0.3s ease;
-}
-
-.navbar .app-name:hover {
-    color: #00d4ff;
-    transform: translateY(-2px);
-}
-
-/* Right-aligned Navigation Links */
-.navbar .nav-links {
     display: flex;
-    gap: 20px; /* Space between Home and Report */
-    align-items: center;
-}
-
-.navbar .nav-links a {
-    color: #2c3e50;
-    font-weight: 700;
-    transition: all 0.3s ease;
-    text-decoration: none;
-}
-
-.navbar .nav-links a:hover {
-    color: #00d4ff;
-    transform: translateY(-2px);
-}
-
-/* Button Section with Enhanced Hover Effects */
-.button-container {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
     flex-wrap: wrap;
-    margin-top: 20px;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 25px;
+    backdrop-filter: blur(10px);
 }
 
-.button, form button, form input[type="submit"] {
+.navbar a {
+    color: #2c3e50;
+    text-decoration: none;
+    font-weight: 600;
+    padding: 10px 15px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.navbar a:hover {
+    background: rgba(255, 255, 255, 0.5);
+    transform: translateY(-2px);
+}
+
+/* Buttons - Perfect for Touch & Mouse */
+.button, button, input[type="submit"] {
     background: linear-gradient(90deg, #3a47d5, #00d4ff);
     color: white;
-    padding: 12px 25px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
     border: none;
+    padding: 14px 25px;
+    font-size: 16px;
+    border-radius: 10px;
     cursor: pointer;
-    transition: all 0.4s ease;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    position: relative;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    display: inline-block;
+    text-align: center;
+    margin: 8px 0;
 }
 
-.button::before, form button::before, form input[type="submit"]::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 300%;
-    height: 300%;
-    background: rgba(255, 255, 255, 0.3);
-    transition: all 0.5s ease;
-    border-radius: 50%;
-    transform: translate(-50%, -50%) scale(0);
-}
-
-.button:hover::before, form button:hover::before, form input[type="submit"]:hover::before {
-    transform: translate(-50%, -50%) scale(1);
-}
-
-.button:hover, form button:hover, form input[type="submit"]:hover {
+.button:hover, button:hover {
     transform: translateY(-3px) scale(1.03);
-    background: linear-gradient(90deg, #00d4ff, #3a47d5);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
 }
 
-/* Table Enhancements with Better Spacing and Modern Look */
+/* Tables - Scrollable on Mobile */
 table {
     width: 100%;
     border-collapse: collapse;
-    margin: 20px 0;
+    margin: 25px 0;
     background: rgba(255, 255, 255, 0.4);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
     border-radius: 12px;
     overflow: hidden;
-    color: #2c3e50;
-    font-size: 14px;
-    transition: transform 0.3s ease;
-}
-
-table:hover {
-    transform: scale(1.01);
 }
 
 table th, table td {
-    padding: 12px 15px;
+    padding: 15px;
     text-align: left;
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 table th {
     background: rgba(255, 255, 255, 0.3);
-    text-transform: uppercase;
-    letter-spacing: 1px;
     font-weight: 700;
-    font-size: 14px;
-    padding: 15px;
 }
 
-table tr:hover {
-    background: rgba(255, 255, 255, 0.5);
-    transition: background 0.3s ease;
+/* Forms - Mobile-Friendly */
+input, select, textarea {
+    width: 100%;
+    padding: 14px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    background: rgba(255, 255, 255, 0.8);
+    font-size: 16px;
+    box-sizing: border-box;
 }
 
-/* Action Buttons in Table */
-table .actions {
-    display: flex;
-    gap: 10px;
-}
-
-table .actions button {
-    background: linear-gradient(90deg, #3a47d5, #00d4ff);
-    color: white;
-    padding: 8px 15px;
-    border-radius: 6px;
-    font-size: 12px;
-    font-weight: 600;
-    border: none;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-}
-
-table .actions button:hover {
-    transform: translateY(-2px);
-    background: linear-gradient(90deg, #00d4ff, #3a47d5);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-}
-
-/* Responsive Design */
+/* Mobile-Specific Tweaks */
 @media (max-width: 768px) {
+    body {
+        font-size: 18px;
+        padding: 10px;
+    }
+
     .container {
         width: 100%;
         padding: 20px;
+        border-radius: 15px;
     }
-    table {
-        font-size: 13px;
-    }
-    table th, table td {
-        padding: 10px;
-    }
-    .button-container {
-        flex-direction: column;
-        align-items: center;
-    }
+
     .navbar {
         flex-direction: column;
-        align-items: center;
-        gap: 10px;
+        text-align: center;
     }
-    .navbar .nav-links {
-        flex-direction: column;
-        gap: 10px;
+
+    .button, button, input[type="submit"] {
+        width: 100%;
+        padding: 16px;
+        font-size: 18px;
+    }
+
+    table {
+        display: block;
+        overflow-x: auto;
+        font-size: 15px;
+    }
+}
+
+/* Desktop Enhancements */
+@media (min-width: 1024px) {
+    .container {
+        padding: 30px;
+    }
+
+    .navbar {
+        padding: 15px 25px;
+    }
+
+    table th, table td {
+        padding: 18px;
     }
 }
