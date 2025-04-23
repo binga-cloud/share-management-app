@@ -241,7 +241,7 @@
                     <td data-label="Current Holding">{{ current_holding }}</td>
                     <td data-label="Avg Cost">
                         {% if current_holding > 0 %}
-                            ${{ "%.2f"|format(((summary.total_buy_cost_with_commission + summary.total_ipo_cost) - summary.total_sell_cost_with_commission) / current_holding ) }}
+                            ${{ "%.2f"|format(((summary.total_buy_cost_with_commission + summary.total_ipo_cost) - (summary.total_sell_cost_with_commission  + summary.total_dividend)) / current_holding ) }}
                         {% else %}
                             $0.00
                         {% endif %}
