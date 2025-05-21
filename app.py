@@ -8,10 +8,11 @@ from models import db, SharePurchase, ShareSale, Dividend, IPOShares, BonusShare
 from forms import BuyForm, SellForm, DividendForm, EditBuyForm, EditSellForm, EditDividendForm, IPOForm, BonusForm, \
     RegistrationForm, LoginForm, ChangePasswordForm
 from datetime import datetime
+import os
 
 app = Flask(__name__)
 app.config.from_object(Config)
-app.config['SECRET_KEY'] = 'your-secret-key'  # Replace with a strong secret key
+app.config['SECRET_KEY'] = 'your-secret-key'  # Keep your existing secret key
 
 # Initialize Flask-Login and Bcrypt
 login_manager = LoginManager()
@@ -36,16 +37,19 @@ def format_date(value, format='%d-%m-%Y'):
 
 app.jinja_env.filters['format_date'] = format_date
 
-# Initialize database and create admin user
+# Initialize database - MODIFIED SECTION STARTS HERE
 with app.app_context():
+    # First create database if it doesn't exist
     db.create_all()
-    # Create admin if not exists
+
+    # Then check if admin exists
     admin = User.query.filter_by(username="admin").first()
     if not admin:
         admin = User(username="admin", is_admin=True)
         admin.set_password("admin123")  # Change this password!
         db.session.add(admin)
         db.session.commit()
+
         # Assign all existing data to admin
         for model in [SharePurchase, ShareSale, Dividend, IPOShares, BonusShares]:
             for record in model.query.filter_by(user_id=None).all():
